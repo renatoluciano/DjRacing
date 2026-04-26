@@ -34,7 +34,7 @@
         <div id="linha-chegada"></div>
     </div>
 
-    <!-- NEW: Text input for the driver's car name -->
+    <!-- Campo de texto para o nome do veículo -->
     <div>
         <input type="text" id="nome-carro" placeholder="Nome do seu carro" value="Carro Padrão">
         <button onclick="iniciarCorrida()">🏁 Iniciar Corrida</button>
@@ -44,6 +44,10 @@
 
     <br>
     <h2>🏆 Melhores Voltas (Leaderboard)</h2>
+    <!-- Botão de Reset para apagar o banco de dados -->
+    <button onclick="limparPlacar()" style="background-color: #e74c3c; color: white; border: none; border-radius: 4px; padding: 10px 15px; cursor: pointer;">🗑️ Limpar Placar</button>
+    <br><br>
+
     <table>
         <thead>
             <tr>
@@ -99,23 +103,38 @@
         }
 
         function enviarTempo(tempo) {
-            // NEW: Captures whatever text was typed into the input field
+            // Captura o texto que foi digitado no input
             const nomeDigitado = document.getElementById('nome-carro').value;
 
             fetch('/salvar-volta/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    veiculo: nomeDigitado, // Sends the custom name to Django
+                    veiculo: nomeDigitado,
                     tempo: parseFloat(tempo) 
                 })
             })
             .then(res => res.json())
             .then(data => {
                 console.log('Salvo com sucesso:', data);
-                window.location.reload(); 
+                window.location.reload(); // Recarrega a página para atualizar o ranking
             })
             .catch(err => console.error('Erro ao salvar:', err));
+        }
+
+        function limparPlacar() {
+            if (confirm("Tem certeza que deseja apagar todos os recordes?")) {
+                fetch('/limpar-recordes/', {
+                    method: 'POST',
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'sucesso') {
+                        window.location.reload(); 
+                    }
+                })
+                .catch(err => console.error('Erro ao limpar:', err));
+            }
         }
     </script>
 </body>
