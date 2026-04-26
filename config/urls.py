@@ -1,8 +1,7 @@
-# config/urls.py
 from django.contrib import admin
-from django.urls import path, include # Adicione o include aqui
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('race.urls')), # Vincula as URLs do app race na raiz
+    path('', include('race.urls')), 
 ]

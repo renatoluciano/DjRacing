@@ -4,11 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import RegistroDeVolta
 import json
 
-# 1. View que renderiza a tela da pista de corrida
+# Renderiza a pista e passa os 10 melhores tempos ordenados
 def pista_corrida(request):
-    return render(request, 'race/pista.html')
+    recordes = RegistroDeVolta.objects.order_by('tempo_segundos')[:10]
+    return render(request, 'race/pista.html', {'recordes': recordes})
 
-# 2. View que recebe o tempo em segundo via POST e salva no banco
+# Recebe o tempo via POST e salva no banco de dados
 @csrf_exempt
 def salvar_volta(request):
     if request.method == 'POST':

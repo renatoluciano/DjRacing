@@ -1,4 +1,3 @@
-# race/models.py
 from django.db import models
 
 class RegistroDeVolta(models.Model):
