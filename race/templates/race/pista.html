@@ -7,7 +7,7 @@
         body { font-family: Arial, sans-serif; text-align: center; background: #eee; }
         #pista {
             width: 80%; height: 100px; background-color: #333;
-            margin: 50px auto; position: relative; border-bottom: 5px dashed #fff;
+            margin: 30px auto; position: relative; border-bottom: 5px dashed #fff;
         }
         #carro {
             width: 50px; height: 30px; background-color: #e74c3c;
@@ -19,6 +19,7 @@
             background-size: 10px 10px;
         }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        input { padding: 10px; font-size: 16px; width: 200px; text-align: center; margin-right: 10px; }
         table { margin: 20px auto; width: 60%; border-collapse: collapse; background: white; }
         th, td { padding: 10px; border: 1px solid #ddd; }
         th { background-color: #333; color: white; }
@@ -33,7 +34,12 @@
         <div id="linha-chegada"></div>
     </div>
 
-    <button onclick="iniciarCorrida()">🏁 Iniciar Corrida</button>
+    <!-- NEW: Text input for the driver's car name -->
+    <div>
+        <input type="text" id="nome-carro" placeholder="Nome do seu carro" value="Carro Padrão">
+        <button onclick="iniciarCorrida()">🏁 Iniciar Corrida</button>
+    </div>
+    
     <h2 id="cronometro">Tempo: 0.00s</h2>
 
     <br>
@@ -93,15 +99,21 @@
         }
 
         function enviarTempo(tempo) {
+            // NEW: Captures whatever text was typed into the input field
+            const nomeDigitado = document.getElementById('nome-carro').value;
+
             fetch('/salvar-volta/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ veiculo: 'Carro Padrão', tempo: parseFloat(tempo) })
+                body: JSON.stringify({ 
+                    veiculo: nomeDigitado, // Sends the custom name to Django
+                    tempo: parseFloat(tempo) 
+                })
             })
             .then(res => res.json())
             .then(data => {
                 console.log('Salvo com sucesso:', data);
-                window.location.reload(); // Recarrega a página para atualizar o ranking
+                window.location.reload(); 
             })
             .catch(err => console.error('Erro ao salvar:', err));
         }
