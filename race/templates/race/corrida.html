@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Corrida</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #eee; }
+        #pista {
+            width: 80%; height: 100px; background-color: #333;
+            margin: 50px auto; position: relative; border-bottom: 5px dashed #fff;
+        }
+        #carro {
+            width: 50px; height: 30px; background-color: #e74c3c;
+            position: absolute; top: 35px; left: 0px; border-radius: 5px;
+        }
+        #linha-chegada {
+            width: 15px; height: 100%; position: absolute; right: 50px;
+            background: linear-gradient(45deg, #fff 25%, #000 25%, #000 75%, #fff 75%);
+            background-size: 10px 10px;
+        }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Simulador de Corrida</h1>
+    
+    <div id="pista">
+        <div id="carro"></div>
+        <div id="linha-chegada"></div>
+    </div>
+
+    <button onclick="iniciarCorrida()">🏁 Iniciar Corrida</button>
+    <h2 id="cronometro">Tempo: 0.00s</h2>
+
+    <script>
+        let inicio;
+
+        function iniciarCorrida() {
+            const carro = document.getElementById('carro');
+            const pista = document.getElementById('pista');
+            const cronometro = document.getElementById('cronometro');
+            
+            let posicao = 0;
+            carro.style.left = '0px';
+            inicio = performance.now(); // Marca o tempo exato de início
+
+            const limiteChegada = pista.clientWidth - 115; 
+
+            // Loop que move o carro
+            const loop = setInterval(() => {
+                posicao += Math.random() * 10 + 2; // Move o carro em velocidade aleatória
+                carro.style.left = posicao + 'px';
+
+                // Atualiza o tempo na tela
+                let tempoAtual = ((performance.now() - inicio) / 1000).toFixed(2);
+                cronometro.innerText = `Tempo: ${tempoAtual}s`;
+
+                // Verifica se passou da linha de chegada
+                if (posicao >= limiteChegada) {
+                    clearInterval(loop);
+                    const tempoFinal = ((performance.now() - inicio) / 1000).toFixed(3);
+                    cronometro.innerText = `🏁 Chegada! Tempo final: ${tempoFinal}s`;
+                    
+                    enviarTempo(tempoFinal);
+                }
+            }, 30);
+        }
+
+        // Função que envia o tempo para a rota do Django
+        function enviarTempo(tempo) {
+            fetch('/salvar-volta/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ veiculo: 'Carro Padrão', tempo: parseFloat(tempo) })
+            })
+            .then(res => res.json())
+            .then(data => console.log('Salvo com sucesso:', data))
+            .catch(err => console.error('Erro ao salvar:', err));
+        }
+    </script>
+</body>
+</html>
